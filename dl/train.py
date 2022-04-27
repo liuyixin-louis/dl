@@ -1,5 +1,40 @@
 import numpy as np
 import torch
+from .utlis import AverageMeter
+
+
+def get_model_state(model):
+    # if isinstance(model, torch.nn.parallel.DistributedDataParallel):
+    if isinstance(model, torch.nn.DataParallel):
+        model_state = model_state_to_cpu(model.module.state_dict())
+    else:
+        model_state = model.state_dict()
+    return model_state
+
+
+def model_state_to_cpu(model_state):
+    model_state_cpu = type(model_state)()
+    for key, val in model_state.items():
+        model_state_cpu[key] = val.cpu()
+    return model_state_cpu
+
+
+
+def evaluate(model, criterion, loader, cpu):
+    acc = AverageMeter()
+    loss = AverageMeter()
+
+    model.eval()
+    for x, y in loader:
+        if not cpu: x, y = x.cuda(), y.cuda()
+        with torch.no_grad():
+            _y = model(x)
+            ac = (_y.argmax(dim=1) == y).sum().item() / len(x)
+            lo = criterion(_y,y).item()
+        acc.update(ac, len(x))
+        loss.update(lo, len(x))
+
+    return acc.average(), loss.average()
 
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""

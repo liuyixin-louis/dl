@@ -1,6 +1,15 @@
 
 import torch
+from torch.utils.data import Dataset
 
+class XYData(Dataset):
+    def __init__(self,x ,y ):
+        self.x = x
+        self.y = y
+    def __getitem__(self, item):
+        return self.x[item],self.y[item]
+    def __len__(self):
+        return len(self.y)
 
 class Loader():
     def __init__(self, dataset, batch_size, shuffle=False, drop_last=False, num_workers=4):

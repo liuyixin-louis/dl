@@ -1,6 +1,26 @@
 import torch
 import random
 import numpy as np
+import torch
+
+
+def evaluate_classify(model, loader, cpu, CE=torch.nn.CrossEntropyLoss()):
+    acc = AverageMeter()
+    loss = AverageMeter()
+
+    model.eval()
+    if not cpu: CE = CE.cuda()
+    for x, y in loader:
+        if not cpu: x, y = x.cuda(), y.cuda()
+        with torch.no_grad():
+            _y = model(x)
+            ac = (_y.argmax(dim=1) == y).sum().item() / len(x)
+            lo = CE(_y,y).item()
+        acc.update(ac, len(x))
+        loss.update(lo, len(x))
+
+    return acc.average(), loss.average()
+
 
 class AverageMeter():
     def __init__(self):

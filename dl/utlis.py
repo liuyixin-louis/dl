@@ -4,6 +4,13 @@ import numpy as np
 import torch
 
 
+def intersection_of_two_tensor(t1, t2):
+    combined = torch.cat((t1, t2))
+    uniques, counts = combined.unique(return_counts=True)
+    # difference = uniques[counts == 1]
+    intersection = uniques[counts > 1]
+    return intersection
+
 def evaluate_classify(model, loader, cpu, CE=torch.nn.CrossEntropyLoss()):
     acc = AverageMeter()
     loss = AverageMeter()

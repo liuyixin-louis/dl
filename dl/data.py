@@ -2,6 +2,7 @@
 import torch
 from torch.utils.data import Dataset
 
+
 class XYData(Dataset):
     def __init__(self,x ,y ):
         self.x = x

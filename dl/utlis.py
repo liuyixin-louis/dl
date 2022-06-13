@@ -2,7 +2,50 @@ import torch
 import random
 import numpy as np
 import torch
+import tarfile
 
+def get_name_from_arvix(url):
+    import requests
+    from bs4 import  BeautifulSoup
+    # test="https://arxiv.org/abs/2202.11203"
+    res = BeautifulSoup(requests.get(url).content, 'lxml').find("h1",attrs={"class":"title mathjax"})
+    title = res.text[6:].replace(" ","-")
+    return title
+
+
+def get_timestamp():
+    import datetime
+    import pandas as pd
+    ts = pd.to_datetime(str(datetime.datetime.now()))
+    d = ts.strftime('%Y-%m-%d-%H-%M-%S')
+    return d
+
+def archive_dir(dir_name,output_filename,format="zip"):
+    import shutil
+    shutil.make_archive(output_filename, format, dir_name)
+
+
+def untar(fname, dirs):
+    """
+    解压tar.gz文件
+    :param fname: 压缩文件名
+    :param dirs: 解压后的存放路径
+    :return: bool
+    """
+
+    try:
+        t = tarfile.open(fname)
+        t.extractall(path = dirs)
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def unzip(path_to_zip_file,directory_to_extract_to):
+    import zipfile
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
 
 def intersection_of_two_tensor(t1, t2):
     combined = torch.cat((t1, t2))

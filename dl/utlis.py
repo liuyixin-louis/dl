@@ -3,6 +3,18 @@ import random
 import numpy as np
 import torch
 import tarfile
+import os
+
+def sround(x, precision=2):
+    return str(round(x, precision))
+
+def file_exists(path):
+    if os.path.exists(path):
+        return True
+    else:
+        return False
+
+
 
 def get_name_from_arvix(url):
     import requests
